@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -25,10 +25,18 @@ import shop
 
 def shopSmart(orderList, fruitShops):
 
-    order
-    for fruit, order_num in orderList:
+    bestShop = fruitShops[0]
 
-    return None
+    for fruitShop in fruitShops:
+        orderCost = fruitShop.getPriceOfOrder(orderList)
+
+        if orderCost < bestShop.getPriceOfOrder(orderList):
+            bestShop = fruitShop
+
+
+    return bestShop
+
+
 
 if __name__ == '__main__':
   "This code runs when you invoke the script from the command line"

@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -29,8 +29,11 @@ fruitPrices = {'apples':2.00, 'oranges': 1.50, 'pears': 1.75,
 def buyLotsOfFruit(orderList):
     totalCost = 0.0
 
-    for _, cost in orderList:
-        totalCost+=cost
+    for fruit, quantity in orderList:
+        if fruit not in fruitPrices:
+            print "Fruit Not Found"
+            return None
+        totalCost+=fruitPrices[fruit] * quantity
 
     return totalCost
 
