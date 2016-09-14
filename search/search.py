@@ -147,9 +147,9 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    from util import Stack
+    from util import Queue
 
-    fringe = Stack()
+    fringe = Queue()
 
     visited = dict()
 
@@ -157,45 +157,28 @@ def breadthFirstSearch(problem):
 
     root_node = Node(start, None)
 
-    finished = problem.isGoalState(start)
-
     fringe.push(root_node)
 
-    while not finished:
+    while not fringe.isEmpty():
         node = fringe.pop()
-        #print node.pos
+
+        if problem.isGoalState(node.pos):
+            goal_node = node
+            break
+
         if node.pos not in visited:
+            visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
                 new_node = Node(successor[0], successor[1])
                 new_node.addParent(node)
+                fringe.push(new_node)
 
-                if problem.isGoalState(new_node.pos):
-                    goal_node = new_node
-                    finished = True
-                    break
-                else:
-                    visited[node.pos] = 1
-                    fringe.push(new_node)
 
     movement = []
 
     while goal_node.action is not None:
         movement.append(goal_node.action)
         goal_node = goal_node.parent
-
-    from game import Directions
-
-    """
-    for x in xrange(len(movement)):
-        if movement[x] == "West":
-            movement[x] = Directions.WEST
-        elif movement[x] == "South":
-            movement[x] = Directions.SOUTH
-        elif movement[x] == "East":
-            movement[x] = Directions.EAST
-        else:
-            movement[x] = Directions.NORTH
-    """
 
     return movement[::-1]
 
