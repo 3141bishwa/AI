@@ -63,15 +63,12 @@ class SearchProblem:
 
 
 class Node:
-    def __init__(self, pos, action):
-        self.pos = pos
-        self.action = action
-        self.parent = None
-
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def addParent(self, node):
         self.parent = node
-
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -105,7 +102,7 @@ def depthFirstSearch(problem):
 
     start = problem.getStartState()
 
-    root_node = Node(start, None)
+    root_node = Node(pos = start, action=None)
 
     fringe.push(root_node)
 
@@ -120,7 +117,7 @@ def depthFirstSearch(problem):
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
-                new_node = Node(successor[0], successor[1])
+                new_node = Node(pos = successor[0], action = successor[1])
                 new_node.addParent(node)
                 fringe.push(new_node)
 
@@ -155,7 +152,7 @@ def breadthFirstSearch(problem):
 
     start = problem.getStartState()
 
-    root_node = Node(start, None)
+    root_node = Node(pos=start, action=None)
 
     fringe.push(root_node)
 
@@ -169,7 +166,7 @@ def breadthFirstSearch(problem):
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
-                new_node = Node(successor[0], successor[1])
+                new_node = Node(pos = successor[0], action = successor[1])
                 new_node.addParent(node)
                 fringe.push(new_node)
 
@@ -185,7 +182,43 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
+
+    fringe = PriorityQueue()
+
+    visited = dict()
+
+    start = problem.getStartState()
+
+    root_node = Node(pos=start, action=None, priority = 0.0)
+
+    fringe.push(root_node,0)
+
+    while not fringe.isEmpty():
+        node = fringe.pop()
+
+        if problem.isGoalState(node.pos):
+            goal_node = node
+            break
+
+        if node.pos not in visited:
+            visited[node.pos] = 1
+            for successor in problem.getSuccessors(node.pos):
+                new_node = Node(pos = successor[0], action = successor[1], \
+                        priority = node.priority + successor[2])
+                new_node.addParent(node)
+
+                fringe.update(new_node, node.priority + successor[2])
+
+
+    movement = []
+
+    while goal_node.action is not None:
+        movement.append(goal_node.action)
+        goal_node = goal_node.parent
+
+    return movement[::-1]
+
 
 def nullHeuristic(state, problem=None):
     """
