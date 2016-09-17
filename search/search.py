@@ -67,8 +67,11 @@ class Node:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+        self.parent = None
+
     def addParent(self, node):
         self.parent = node
+
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -127,6 +130,8 @@ def depthFirstSearch(problem):
         movement.append(goal_node.action)
         goal_node = goal_node.parent
 
+    # Only return this Specific movement for the Pacman problem. For the
+    # rest, return the actions as specified in the problem
     """
     for x in xrange(len(movement)):
         if movement[x] == "West":
@@ -143,7 +148,6 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
     from util import Queue
 
     fringe = Queue()
@@ -181,7 +185,6 @@ def breadthFirstSearch(problem):
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
     from util import PriorityQueue
 
     fringe = PriorityQueue()
@@ -204,6 +207,8 @@ def uniformCostSearch(problem):
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
+                # Setting the cost of a node as the cumulative cost of reaching
+                # that node through a specific path
                 new_node = Node(pos = successor[0], action = successor[1], \
                         priority = node.priority + successor[2])
                 new_node.addParent(node)
@@ -212,7 +217,8 @@ def uniformCostSearch(problem):
 
 
     movement = []
-
+    # Going through the goal_node's parents to find the path taken to reach
+    # the goal.
     while goal_node.action is not None:
         movement.append(goal_node.action)
         goal_node = goal_node.parent
@@ -222,16 +228,59 @@ def uniformCostSearch(problem):
 
 def nullHeuristic(state, problem=None):
     """
-    A heuristic function estimates the cost from the current state to the nearest
-    goal in the provided SearchProblem.  This heuristic is trivial.
+    A heuristic function estimates the cost from the current state to the
+    nearest goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    from util import PriorityQueue
 
+    #import code
+    #code.interact(local=dict(globals(), **locals()))
+    fringe = PriorityQueue()
+
+    start = problem.getStartState()
+
+    root_node = Node(pos=start, action=None, cost_priority = 0.0,
+            heuristic_priority = heuristic(start, problem))
+
+    root_node.addParent(None)
+
+    fringe.push(root_node,0)
+
+    visited = set()
+
+    while not fringe.isEmpty():
+        node = fringe.pop()
+
+        if problem.isGoalState(node.pos):
+            goal_node = node
+            break
+
+        if node.pos not in visited:
+            visited.add(node.pos)
+            for successor in problem.getSuccessors(node.pos):
+                # Setting the cost of a node as the cumulative cost of reaching
+                # that node through a specific path
+                new_node = Node(pos = successor[0], action = successor[1], \
+                       cost_priority = node.cost_priority + successor[2],
+                        heuristic_priority = heuristic(successor[0], problem))
+                new_node.addParent(node)
+
+                fringe.update(new_node,
+                        new_node.cost_priority + new_node.heuristic_priority)
+
+
+    movement = []
+    # Going through the goal_node's parents to find the path taken to reach
+    # the goal.
+    while goal_node.action is not None:
+        movement.append(goal_node.action)
+        goal_node = goal_node.parent
+
+    return movement[::-1]
 
 # Abbreviations
 bfs = breadthFirstSearch
