@@ -67,11 +67,6 @@ class Node:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        self.parent = None
-
-    def addParent(self, node):
-        self.parent = node
-
 def tinyMazeSearch(problem):
     """
     Returns a sequence of moves that solves tinyMaze.  For any other maze, the
@@ -103,9 +98,7 @@ def depthFirstSearch(problem):
 
     visited = dict()
 
-    start = problem.getStartState()
-
-    root_node = Node(pos = start, action=None)
+    root_node = Node(pos = problem.getStartState(), path = [])
 
     fringe.push(root_node)
 
@@ -113,38 +106,15 @@ def depthFirstSearch(problem):
         node = fringe.pop()
 
         if problem.isGoalState(node.pos):
-            goal_node = node
-            break
+            return node.path
 
         #print node.pos
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
-                new_node = Node(pos = successor[0], action = successor[1])
-                new_node.addParent(node)
+                new_node = Node(
+                        pos = successor[0], path = node.path + [successor[1]])
                 fringe.push(new_node)
-
-    movement = []
-
-    while goal_node.action is not None:
-        movement.append(goal_node.action)
-        goal_node = goal_node.parent
-
-    # Only return this Specific movement for the Pacman problem. For the
-    # rest, return the actions as specified in the problem
-    """
-    for x in xrange(len(movement)):
-        if movement[x] == "West":
-            movement[x] = Directions.WEST
-        elif movement[x] == "South":
-            movement[x] = Directions.SOUTH
-        elif movement[x] == "East":
-            movement[x] = Directions.EAST
-        else:
-            movement[x] = Directions.NORTH
-    """
-
-    return movement[::-1]
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -156,7 +126,7 @@ def breadthFirstSearch(problem):
 
     start = problem.getStartState()
 
-    root_node = Node(pos=start, action=None)
+    root_node = Node(pos=problem.getStartState(), path=[])
 
     fringe.push(root_node)
 
@@ -164,24 +134,14 @@ def breadthFirstSearch(problem):
         node = fringe.pop()
 
         if problem.isGoalState(node.pos):
-            goal_node = node
-            break
+            return node.path
 
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
-                new_node = Node(pos = successor[0], action = successor[1])
-                new_node.addParent(node)
+                new_node = Node(
+                        pos = successor[0], path = node.path + [successor[1]])
                 fringe.push(new_node)
-
-
-    movement = []
-
-    while goal_node.action is not None:
-        movement.append(goal_node.action)
-        goal_node = goal_node.parent
-
-    return movement[::-1]
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -193,7 +153,7 @@ def uniformCostSearch(problem):
 
     start = problem.getStartState()
 
-    root_node = Node(pos=start, action=None, priority = 0.0)
+    root_node = Node(pos=start, path=[], priority = 0.0)
 
     fringe.push(root_node,0)
 
@@ -201,31 +161,17 @@ def uniformCostSearch(problem):
         node = fringe.pop()
 
         if problem.isGoalState(node.pos):
-            goal_node = node
-            break
+            return node.path
 
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
                 # Setting the cost of a node as the cumulative cost of reaching
                 # that node through a specific path
-                new_node = Node(pos = successor[0], action = successor[1], \
-                        priority = node.priority + successor[2])
-                new_node.addParent(node)
-
+                new_node = Node(pos = successor[0], path  = node.path + \
+                        [successor[1]],priority = node.priority + successor[2])
                 fringe.update(new_node, node.priority + successor[2])
-
-
-    movement = []
-    # Going through the goal_node's parents to find the path taken to reach
-    # the goal.
-    while goal_node.action is not None:
-        movement.append(goal_node.action)
-        goal_node = goal_node.parent
-
-    return movement[::-1]
-
-
+    
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the
@@ -243,10 +189,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
     start = problem.getStartState()
 
-    root_node = Node(pos=start, action=None, cost_priority = 0.0,
+    root_node = Node(pos=start, path = [], cost_priority = 0.0,
             heuristic_priority = heuristic(start, problem))
-
-    root_node.addParent(None)
 
     fringe.push(root_node,0)
 
@@ -256,31 +200,20 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         node = fringe.pop()
 
         if problem.isGoalState(node.pos):
-            goal_node = node
-            break
+            return node.path
 
         if node.pos not in visited:
             visited.add(node.pos)
             for successor in problem.getSuccessors(node.pos):
                 # Setting the cost of a node as the cumulative cost of reaching
                 # that node through a specific path
-                new_node = Node(pos = successor[0], action = successor[1], \
-                       cost_priority = node.cost_priority + successor[2],
+                new_node = Node(pos = successor[0], path = node.path + \
+                        [successor[1]], cost_priority = node.cost_priority + successor[2],
                         heuristic_priority = heuristic(successor[0], problem))
-                new_node.addParent(node)
 
                 fringe.update(new_node,
                         new_node.cost_priority + new_node.heuristic_priority)
 
-
-    movement = []
-    # Going through the goal_node's parents to find the path taken to reach
-    # the goal.
-    while goal_node.action is not None:
-        movement.append(goal_node.action)
-        goal_node = goal_node.parent
-
-    return movement[::-1]
 
 # Abbreviations
 bfs = breadthFirstSearch
