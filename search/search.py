@@ -108,7 +108,6 @@ def depthFirstSearch(problem):
         if problem.isGoalState(node.pos):
             return node.path
 
-        #print node.pos
         if node.pos not in visited:
             visited[node.pos] = 1
             for successor in problem.getSuccessors(node.pos):
@@ -124,13 +123,12 @@ def breadthFirstSearch(problem):
 
     visited = dict()
 
-    start = problem.getStartState()
-
     root_node = Node(pos=problem.getStartState(), path=[])
 
     fringe.push(root_node)
 
     while not fringe.isEmpty():
+
         node = fringe.pop()
 
         if problem.isGoalState(node.pos):
@@ -171,7 +169,7 @@ def uniformCostSearch(problem):
                 new_node = Node(pos = successor[0], path  = node.path + \
                         [successor[1]],priority = node.priority + successor[2])
                 fringe.update(new_node, node.priority + successor[2])
-    
+
 def nullHeuristic(state, problem=None):
     """
     A heuristic function estimates the cost from the current state to the
